@@ -2,6 +2,8 @@
 
 > 将Typecho接口通过MCP Server 暴露出来，用于提供给`AI Agent`使用
 
+> 版本兼容性：***Typecho 1.3.0***
+
 ## Typecho 官方资料
 1. Typecho 源码仓库 `https://github.com/typecho/typecho.git`
 2. Typecho 插件开发说明文档 `https://docs.typecho.org/develop/plugin/`
