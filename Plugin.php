@@ -6,7 +6,7 @@
  *
  * @package TypechoMcpServer
  * @author AbnerSC
- * @version 1.0.0
+ * @version 1.0.2
  * @link https://github.com/AbnerSC/typecho-mcpserver.git
  * @dependence Typecho 1.3.0
  */
