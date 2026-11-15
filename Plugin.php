@@ -1,9 +1,6 @@
 <?php
 /**
- * Typecho MCP Server —— 将 Typecho 内容管理能力暴露为 MCP (Model Context Protocol) 服务
- *
- * 以无状态 Streamable HTTP 形态工作：AI 客户端统一 POST JSON-RPC 2.0 到
- * 站点端点（默认 /mcp），即可通过自然语言完成文章/页面/分类/标签管理。
+ * Typecho MCP Server —— 将 Typecho 内容管理能力暴露为 MCP (Model Context Protocol) 服务。
  *
  * 环境要求：Typecho 1.3.0（不兼容 1.2.x 及以下），PHP >= 7.4（推荐 8.x）
  *
