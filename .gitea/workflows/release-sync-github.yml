@@ -7,6 +7,10 @@
 #     本工作流负责补齐 Release 这一层
 #   - 本目录（.gitea/workflows）会被镜像带到 GitHub，但 GitHub 只解析
 #     .github/workflows，因此不会在 GitHub 侧重复执行本工作流
+#   - release-package.yml 负责把部署文件打包为 zip 挂到 Gitea Release，
+#     与本工作流同时被 release published 触发；本工作流会在自动触发时
+#     轮询等待其 zip 附件就绪再读取附件列表（见步骤 1.5），
+#     否则会把「缺 zip 的 Release」同步到 GitHub
 #
 # 触发方式：
 #   1) 自动：在 Gitea 发布版本（release 事件 published）后立即触发，
@@ -216,6 +220,31 @@ jobs:
             FORCE_UPDATE="true"
           fi
           echo "GitHub 已存在同名 Release 时覆盖：$FORCE_UPDATE"
+
+          # ---------- 1.5 等待打包附件就绪（仅自动触发场景） ----------
+          # release-package.yml 与本工作流同时被 release published 触发：
+          # 打包（下载源码、压缩、上传）通常晚于本步骤读取附件列表，
+          # 不等待会把「缺 zip 的 Release」同步到 GitHub。
+          # 手动补同步历史版本时附件早已就位，跳过等待。
+          if [[ "$EVENT_NAME" == "release" ]]; then
+            waited=0
+            while :; do
+              code=$(http "$TMP/zipwait.json" GET "$GITEA_API/repos/$GITEA_REPO/releases/tags/$TAG" "${GT_HDR[@]}")
+              [[ "$code" == "200" ]] \
+                || err "等待打包附件时读取 Gitea Release 失败（HTTP $code）：$(peek "$TMP/zipwait.json")"
+              zip_count=$(jq -r '[(.assets // [])[] | select((.name // "") | endswith(".zip"))] | length' "$TMP/zipwait.json")
+              if [[ "$zip_count" != "0" ]]; then
+                echo "打包 zip 附件已就绪（累计等待 ${waited}s）"
+                break
+              fi
+              if [[ "$waited" -ge 480 ]]; then
+                echo "::warning::等待 480s 仍未见 zip 附件（打包工作流可能失败），先按当前附件列表继续同步；打包恢复后手动重跑本工作流即可补传"
+                break
+              fi
+              sleep 15
+              waited=$((waited + 15))
+            done
+          fi
 
           # ---------- 2. 读取 Gitea Release 元数据 ----------
           code=$(http "$TMP/gitea.json" GET "$GITEA_API/repos/$GITEA_REPO/releases/tags/$TAG" "${GT_HDR[@]}")
