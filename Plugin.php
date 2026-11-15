@@ -153,6 +153,7 @@ class Plugin implements PluginInterface
   <p style="margin:4px 0;">· Token 须严格保密，泄漏后请立即在下方重置；建议站点启用 HTTPS，避免 Token 明文传输。</p>
   <p style="margin:4px 0;">· 发布开关当前{$publishState}。</p>
   <p style="margin:4px 0;">· 删除开关当前{$deleteState}。</p>
+  <p style="margin:4px 0;">· 附件上传：AI 可上传附件到媒体库（返回访问 URL）；MCP 不提供附件删除，删除请到后台「管理 → 附件」。</p>
 </div>
 HTML;
 

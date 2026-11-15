@@ -1,6 +1,6 @@
 <?php
 /**
- * 工具注册表：16 个 MCP Tools 的元数据（名称/描述/inputSchema/handler）集中注册与查找
+ * 工具注册表：17 个 MCP Tools 的元数据（名称/描述/inputSchema/handler）集中注册与查找
  *
  * @package TypechoMcpServer
  */
@@ -8,6 +8,7 @@
 namespace TypechoMcpServer\Tools;
 
 use TypechoMcpServer\Services\CategoryService;
+use TypechoMcpServer\Services\MediaService;
 use TypechoMcpServer\Services\PageService;
 use TypechoMcpServer\Services\PostService;
 use TypechoMcpServer\Services\SiteService;
@@ -26,9 +27,11 @@ class ToolRegistry
         $categories = new CategoryService($config);
         $tags = new TagService($config);
         $site = new SiteService($config);
+        $media = new MediaService($config);
 
         $this->registerReadTools($posts, $categories, $tags, $site);
         $this->registerWriteTools($posts, $pages, $categories, $tags);
+        $this->registerMediaTools($media);
     }
 
     /** @return ToolDefinition[] */
@@ -305,6 +308,31 @@ class ToolRegistry
             ],
             function (array $args) use ($tags) {
                 return $tags->deleteTag($args);
+            }
+        ));
+    }
+
+    // ------------------------------------------------------------------
+    // 媒体工具（附件仅上传，不提供删除）
+    // ------------------------------------------------------------------
+    private function registerMediaTools(MediaService $media): void
+    {
+        $this->add(new ToolDefinition(
+            'upload_attachment',
+            '上传附件（图片/文档等）到站点媒体库，返回附件 cid 与访问 URL。扩展名须在站点允许上传的类型内。安全策略：MCP 仅支持上传附件，不提供附件删除（删除请到后台媒体管理）。',
+            [
+                'type' => 'object',
+                'properties' => [
+                    'filename'       => ['type' => 'string', 'description' => '文件名（含扩展名），如 photo.png、report.pdf'],
+                    'content_base64' => ['type' => 'string', 'description' => '文件二进制内容的 Base64 编码（可含 data:...;base64, 前缀）'],
+                    'title'          => ['type' => 'string', 'description' => '附件标题，留空使用文件名'],
+                    'description'    => ['type' => 'string', 'description' => '附件描述'],
+                    'parentId'       => ['type' => 'integer', 'description' => '可选，关联内容 ID（文章/页面 cid，来自 list_posts）'],
+                ],
+                'required' => ['filename', 'content_base64'],
+            ],
+            function (array $args) use ($media) {
+                return $media->uploadAttachment($args);
             }
         ));
     }

@@ -23,6 +23,7 @@ use Widget\Contents\Post\Edit as PostEdit;
 use Widget\Metas\Category\Edit as CategoryEdit;
 use Widget\Metas\Tag\Edit as TagEdit;
 use Widget\Options;
+use Widget\Upload;
 use Widget\User;
 
 class TypechoAdapter
@@ -135,6 +136,20 @@ class TypechoAdapter
     {
         /** @var TagEdit $widget */
         $widget = TagEdit::alloc(null, $input, $callback);
+
+        return $widget;
+    }
+
+    /**
+     * 在 request 沙箱中执行附件上传回调（落库复用 Upload::insert 原生逻辑）
+     *
+     * @param callable $callback function (Upload $widget)
+     * @return Upload
+     */
+    public static function withUpload(callable $callback): Upload
+    {
+        /** @var Upload $widget */
+        $widget = Upload::alloc(null, [], $callback);
 
         return $widget;
     }
