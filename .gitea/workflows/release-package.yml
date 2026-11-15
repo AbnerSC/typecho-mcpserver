@@ -66,9 +66,8 @@ jobs:
   package-release:
     name: 打包部署文件并挂载附件
     # 只需 curl/jq/zip + Gitea API，无需检出 git 仓库（源码走 API tarball），
-    # 任何带 bash 的 runner 镜像均可运行；沿用实例上现成的 golang runner，
     # 如需换 runner 只改这一行
-    runs-on: golang
+    runs-on: base
     timeout-minutes: 15
     steps:
       - name: 准备 curl、jq 与 zip
