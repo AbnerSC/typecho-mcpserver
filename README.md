@@ -39,3 +39,7 @@
 - 管理分类
 - 管理标签
 - 上传附件（仅上传，不提供附件删除，删除请到后台媒体管理）
+
+
+## M8ven
+[![M8ven Score](https://m8ven.ai/badge/mcp/abnersc-typecho-mcpserver-19xn1x?v=9e70b111548a5d597d577e916596badf)](https://m8ven.ai/mcp/abnersc-typecho-mcpserver-19xn1x?s=readme)
